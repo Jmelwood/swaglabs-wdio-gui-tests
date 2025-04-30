@@ -9,7 +9,7 @@ class CartPage extends GeneralPage {
     return $$('div.inventory_item_name');
   }
 
-  async inventoryItemLink(itemName: string) {
+  inventoryItemLink(itemName: string) {
     return $(`div=${itemName}`);
   }
 
@@ -21,7 +21,7 @@ class CartPage extends GeneralPage {
     return $('button[data-test="continue-shopping"]');
   }
 
-  async removeFromCartButton(itemId: string) {
+  removeFromCartButton(itemId: string) {
     return $(`button[data-test="remove-${itemId}"]`);
   }
 
@@ -31,7 +31,7 @@ class CartPage extends GeneralPage {
    */
   async clickRemoveFromCart(itemName: string) {
     const itemId = itemName.replace(/\s/g, '-').toLowerCase();
-    await (await this.removeFromCartButton(itemId)).waitForAndClick();
+    await this.removeFromCartButton(itemId).waitForAndClick();
   }
 
   async open() {

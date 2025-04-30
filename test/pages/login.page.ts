@@ -1,5 +1,5 @@
-import GeneralPage from './general.page.js';
 import type { User } from '../util/users.js';
+import GeneralPage from './general.page.js';
 
 class LoginPage extends GeneralPage {
   constructor() {

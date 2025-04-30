@@ -1,11 +1,12 @@
-import type { Options } from '@wdio/types';
 import { browser } from '@wdio/globals';
-
 import chance from 'chance';
+import { ReportAggregator } from 'wdio-html-nice-reporter';
+
+let reportAggregator: ReportAggregator;
 
 const debug = process.env.DEBUG;
 
-export const config: Options.Testrunner = {
+export const config: WebdriverIO.Config = {
   //
   // ====================
   // Runner Configuration
@@ -52,14 +53,10 @@ export const config: Options.Testrunner = {
   //
   capabilities: [
     {
-      // maxInstances can get overwritten per capability. So if you have an in-house Selenium
-      // grid with only 5 firefox instances available you can make sure that not more than
-      // 5 instances get started at a time.
-      maxInstances: debug ? 1 : 5,
-      //
       browserName: 'chrome',
       'goog:chromeOptions': {
-        args: process.env.CI == 'true' ? ['headless', 'disable-gpu'] : []
+        args: process.env.CI == 'true' ? ['headless', 'disable-gpu'] : [],
+        prefs: { profile: { password_manager_leak_detection: false } }
       }
       // If outputDir is provided WebdriverIO can capture driver session logs
       // it is possible to configure which logTypes to include/exclude.
@@ -101,11 +98,11 @@ export const config: Options.Testrunner = {
   baseUrl: 'https://www.saucedemo.com/',
   //
   // Default timeout for all waitFor* commands.
-  waitforTimeout: 10000,
+  waitforTimeout: 10_000,
   //
   // Default timeout in milliseconds for request
   // if browser driver or grid doesn't send response
-  connectionRetryTimeout: 120000,
+  connectionRetryTimeout: 120_000,
   //
   // Default request retries count
   connectionRetryCount: 3,
@@ -136,7 +133,25 @@ export const config: Options.Testrunner = {
   // Test reporter for stdout.
   // The only one supported by default is 'dot'
   // see also: https://webdriver.io/docs/dot-reporter
-  reporters: process.env.CI == 'true' ? [['ctrf-json', { outputDir: 'reports'}], 'spec'] : ['spec'],
+  reporters:
+    process.env.CI == 'true'
+      ? [['ctrf-json', { outputDir: 'reports' }], 'spec']
+      : [
+          [
+            'html-nice',
+            {
+              outputDir: './reports/html-reports/',
+              filename: 'results.html',
+              reportTitle: 'HTML Report',
+              linkScreenshots: true,
+              showInBrowser: true,
+              collapseTests: false,
+              //to turn on screenshots after every test
+              useOnAfterCommandForScreenshot: false
+            }
+          ],
+          'spec'
+        ],
 
   //
   // Options to be passed to Mocha.
@@ -145,17 +160,6 @@ export const config: Options.Testrunner = {
     ui: 'bdd',
     timeout: debug ? 9999999 : 60000,
     bail: false
-  },
-
-  // TypeScript options - WDIO can auto-transpile
-  autoCompileOpts: {
-    autoCompile: true,
-    // see https://github.com/TypeStrong/ts-node#cli-and-programmatic-options
-    // for all available options
-    tsNodeOpts: {
-      transpileOnly: false,
-      files: true
-    }
   },
   //
   // =====
@@ -170,8 +174,16 @@ export const config: Options.Testrunner = {
    * @param config wdio configuration object
    * @param capabilities list of capabilities details
    */
-  // onPrepare: function (config, capabilities) {
-  // },
+  onPrepare: function (_config, capabilities) {
+    reportAggregator = new ReportAggregator({
+      outputDir: './reports/html-reports/',
+      filename: 'results.html',
+      reportTitle: 'HTML Report',
+      browserName: capabilities[0].platformName,
+      collapseTests: true
+    });
+    reportAggregator.clean();
+  },
   /**
    * Gets executed before a worker process is spawned and can be used to initialise specific service
    * for that worker as well as modify runtime environments in an async fashion.
@@ -199,7 +211,7 @@ export const config: Options.Testrunner = {
    * @param _specs        List of spec file paths that are to be run
    * @param browser       instance of created browser/device session
    */
-  before: function (_capabilities, _specs, browser) {
+  before: function (_capabilities, _specs, browser: WebdriverIO.Browser) {
     global.chance = chance.Chance();
 
     // Custom command creation
@@ -211,8 +223,12 @@ export const config: Options.Testrunner = {
      */
     browser.addCommand(
       'waitForAndClick',
-      async function (this: WebdriverIO.Element, strict = true, timeout: number = browser.options.waitforTimeout) {
-        strict ? await this.waitForClickable({ timeout }) : await this.waitForDisplayed({ timeout });
+      async function (this: WebdriverIO.Element, strict = true, timeout: number = browser.options.waitforTimeout!) {
+        if (strict) {
+          await this.waitForClickable({ timeout });
+        } else {
+          await this.waitForDisplayed({ timeout });
+        }
         await this.click();
       },
       true
@@ -224,12 +240,12 @@ export const config: Options.Testrunner = {
      * @param elements - A list of WDIO elements
      * @param visibility - Controls whether you wish for each element to be visible or not.
      */
-    browser.addCommand('waitForElements', async function (elements: Array<WebdriverIO.Element>, visibility = true) {
+    browser.addCommand('waitForElements', async function (elements: WebdriverIO.Element[], visibility = true) {
       for (const element of elements) {
         await element.waitForDisplayed({
           reverse: !visibility,
           // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          timeoutMsg: `ERROR: Element ${element.selector} never became visible.`
+          timeoutMsg: `ERROR: Element ${element.selector.toString()} never became visible.`
         });
       }
     });
@@ -276,7 +292,7 @@ export const config: Options.Testrunner = {
    * @param _context Context object
    * @param root0 Meta information about test run - { error, result, duration, passed, retries }
    */
-  // eslint-disable-next-line no-unused-vars
+
   afterTest: async function (_test, _context, { error, passed }) {
     // Start REPL mode if in debug mode and the test fails
     if (debug && !passed) {
@@ -284,7 +300,7 @@ export const config: Options.Testrunner = {
       // eslint-disable-next-line wdio/no-debug
       await browser.debug();
     }
-  }
+  },
   /**
    * Hook that gets executed after the suite has ended
    * @param suite suite details
@@ -325,8 +341,9 @@ export const config: Options.Testrunner = {
    * @param capabilities list of capabilities details
    * @param results object containing test results
    */
-  // onComplete: function(exitCode, config, capabilities, results) {
-  // },
+  onComplete: async function (_exitCode, _config, _capabilities, _results) {
+    await reportAggregator.createReport();
+  }
   /**
    * Gets executed when a refresh happens.
    * @param oldSessionId session ID of the old session

@@ -1,4 +1,4 @@
-import { map } from "async";
+import { IterableCollection, map } from 'async';
 
 /**
  * Converts an itemName into an elementId (removing spaces, symbols, etc.)
@@ -16,14 +16,13 @@ export function nameToId(itemName: string) {
  * @param sortFunction The function to use to sort the array of elements
  */
 export async function compareSortedStringArrays(
-  array,
+  array: IterableCollection<WebdriverIO.Element>,
   sortFunction: (val1: string, val2: string) => number
 ) {
-  const actualArray = await map(array,
-    async (element: WebdriverIO.Element) => {
-      const text = await element.getText();
-      return text
-    });
+  const actualArray = await map(array, async (element: WebdriverIO.Element) => {
+    const text = await element.getText();
+    return text;
+  });
   const expectedArray = [...actualArray];
   // Using the sort function on this array should do nothing if already sorted properly
   expectedArray.sort(sortFunction);
@@ -37,14 +36,13 @@ export async function compareSortedStringArrays(
  * @param sortFunction The function to use to sort the array of elements
  */
 export async function compareSortedNumberArrays(
-  array,
+  array: IterableCollection<WebdriverIO.Element>,
   sortFunction: (val1: number, val2: number) => number
 ) {
-  const actualArray = await map(array,
-    async (element: WebdriverIO.Element) => {
-      const text = await element.getText();
-      return parseFloat(text.replace('$', ''))
-    });
+  const actualArray = await map(array, async (element: WebdriverIO.Element) => {
+    const text = await element.getText();
+    return parseFloat(text.replace('$', ''));
+  });
   const expectedArray = [...actualArray];
   // Using the sort function on this array should do nothing if already sorted properly
   expectedArray.sort(sortFunction);

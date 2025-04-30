@@ -1,13 +1,13 @@
+import { map } from 'async';
 import { expect } from 'expect-webdriverio';
-import { map } from 'async'
 
-import InventoryPage from '../pages/inventory.page.js';
-import HeaderModal from '../pages/header.modal.js';
 import CartPage from '../pages/cart.page.js';
-import LoginPage from '../pages/login.page.js';
 import CheckoutPage from '../pages/checkout.page.js';
-import Users from '../util/users.js';
+import HeaderModal from '../pages/header.modal.js';
+import InventoryPage from '../pages/inventory.page.js';
+import LoginPage from '../pages/login.page.js';
 import { nameToId } from '../util/misc.js';
+import Users from '../util/users.js';
 
 describe('Checkout', () => {
   before(async () => {
@@ -31,11 +31,14 @@ describe('Checkout', () => {
     await HeaderModal.shoppingCartIcon.click();
     await CartPage.waitForPageShown();
     await CartPage.waitForElements();
-    let cartResults = await map(CartPage.inventoryItems, async (element: WebdriverIO.Element) => await element.getText());
+    let cartResults = await map(
+      CartPage.inventoryItems,
+      async (element: WebdriverIO.Element) => await element.getText()
+    );
     let expectedCartResult = cartResults.find((item) => item === itemName);
     await expect(expectedCartResult).toBeDefined();
     await CartPage.clickRemoveFromCart(itemElementId);
-    cartResults = await map (CartPage.inventoryItems, async (element: WebdriverIO.Element) => await element.getText());
+    cartResults = await map(CartPage.inventoryItems, async (element: WebdriverIO.Element) => await element.getText());
     expectedCartResult = cartResults.find((item) => item === itemName);
     await expect(expectedCartResult).toBeUndefined();
   });

@@ -1,8 +1,4 @@
 {
-  "ts-node": {
-    "files": true,
-    "esm": true
-  },
   "compilerOptions": {
     // Code generation options
     "target": "esnext",
@@ -23,6 +19,6 @@
     "resolveJsonModule": true,
     "noErrorTruncation": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "<node_internals>/**"]
+  "include": ["**/*.ts", "**/*.js", "**/*.mjs", "**/*.cjs"],
+  "exclude": ["node_modules", "<node_internals>/**", "eslint.config.js"]
 }

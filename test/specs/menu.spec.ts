@@ -1,8 +1,8 @@
 import { expect } from 'expect-webdriverio';
 
-import InventoryPage from '../pages/inventory.page.js';
 import CartPage from '../pages/cart.page.js';
 import HeaderModal from '../pages/header.modal.js';
+import InventoryPage from '../pages/inventory.page.js';
 import LoginPage from '../pages/login.page.js';
 import Users from '../util/users.js';
 

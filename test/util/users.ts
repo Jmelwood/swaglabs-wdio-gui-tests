@@ -1,10 +1,10 @@
-export type User = {
+export interface User {
   firstName: string;
   lastName: string;
   zipCode: string;
   username: string;
   password: string;
-};
+}
 
 export default {
   standard: {

@@ -1,5 +1,6 @@
-import GeneralPage from './general.page.js';
 import { map } from 'async';
+
+import GeneralPage from './general.page.js';
 
 class InventoryPage extends GeneralPage {
   constructor() {
@@ -34,7 +35,7 @@ class InventoryPage extends GeneralPage {
     return $$('div.inventory_item_price');
   }
 
-  async inventoryItemLink(itemName: string) {
+  inventoryItemLink(itemName: string) {
     return $(`div=${itemName}`);
   }
 
@@ -43,11 +44,11 @@ class InventoryPage extends GeneralPage {
     await this.waitForElements();
   }
 
-  async addToCartButton(itemId: string) {
+  addToCartButton(itemId: string) {
     return $(`[data-test="add-to-cart-${itemId}"]`);
   }
 
-  async removeFromCartButton(itemId: string) {
+  removeFromCartButton(itemId: string) {
     return $(`[data-test="remove-${itemId}"]`);
   }
 
@@ -57,7 +58,10 @@ class InventoryPage extends GeneralPage {
    */
   async pickItemRandomly() {
     const itemNames = await map(this.inventoryItemNames, async (item: WebdriverIO.Element) => await item.getText());
-    const itemDescriptions = await map(this.inventoryItemDescriptions, async (item: WebdriverIO.Element) => await item.getText());
+    const itemDescriptions = await map(
+      this.inventoryItemDescriptions,
+      async (item: WebdriverIO.Element) => await item.getText()
+    );
     const itemPrices = await map(this.inventoryItemPrices, async (item: WebdriverIO.Element) => await item.getText());
     const choice = chance.integer({ min: 0, max: itemNames.length - 1 });
     const randomItem = {
@@ -73,7 +77,7 @@ class InventoryPage extends GeneralPage {
    * @param itemId The item's id
    */
   async clickAddToCart(itemId: string) {
-    await (await this.addToCartButton(itemId)).waitForAndClick();
+    await this.addToCartButton(itemId).waitForAndClick();
   }
 
   /**
@@ -81,13 +85,13 @@ class InventoryPage extends GeneralPage {
    * @param itemId The item's id
    */
   async clickRemoveFromCart(itemId: string) {
-    await (await this.removeFromCartButton(itemId)).waitForAndClick();
+    await this.removeFromCartButton(itemId).waitForAndClick();
   }
 
   async waitForElements(visibility = true) {
     const elements = [this.subheaderLabel, this.sortDropdown];
     await browser.waitForElements(elements, visibility);
-    await browser.waitUntil(async () => (await this.inventoryItems).length > 0);
+    await browser.waitUntil(async () => (await this.inventoryItems.length) > 0);
   }
 }
 

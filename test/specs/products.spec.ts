@@ -1,11 +1,12 @@
 import { expect } from 'expect-webdriverio';
 
+import config from '../../wdio.conf.js';
+import HeaderModal from '../pages/header.modal.js';
 import InventoryPage from '../pages/inventory.page.js';
 import ItemPage from '../pages/item.page.js';
-import HeaderModal from '../pages/header.modal.js';
 import LoginPage from '../pages/login.page.js';
+import { compareSortedNumberArrays, compareSortedStringArrays, nameToId } from '../util/misc.js';
 import Users from '../util/users.js';
-import { nameToId, compareSortedStringArrays, compareSortedNumberArrays } from '../util/misc.js';
 
 describe('Products Page', () => {
   before(async () => {
@@ -21,24 +22,24 @@ describe('Products Page', () => {
   it('Each product entry is fully loaded', async () => {
     await expect(InventoryPage.inventoryItems).toBeElementsArrayOfSize({ gte: 1 });
     // Check that all images are valid
-    for (const element of await InventoryPage.inventoryItemImages) {
+    for await (const element of InventoryPage.inventoryItemImages) {
       await expect(element).toHaveAttribute('src', expect.stringContaining('/static/media/'));
       const imageUrl = await element.getAttribute('src');
       const imageName = imageUrl.substring(imageUrl.indexOf('/media/') + 7);
-      await browser.newWindow(imageUrl);
+      await browser.newWindow(config.baseUrl + imageUrl);
       await expect(browser).toHaveTitle(expect.stringContaining(imageName));
       await browser.closeWindow();
       await browser.switchToWindow((await browser.getWindowHandles())[0]);
     }
     // Check that all descriptions are filled with text
-    for (const element of await InventoryPage.inventoryItemDescriptions) {
+    for await (const element of InventoryPage.inventoryItemDescriptions) {
       await expect(element.getText()).not.toEqual('');
     }
   });
 
   it('The item information on the inventory list matches its linked details page', async () => {
     // Pick an item at random
-    const itemCount = (await InventoryPage.inventoryItems).length;
+    const itemCount = await InventoryPage.inventoryItems.length;
     const itemId = chance.integer({ min: 0, max: itemCount - 1 });
     // Record the "expected" values for the chosen item
     const expectedItemName = await InventoryPage.inventoryItemNames[itemId].getText();
@@ -46,7 +47,7 @@ describe('Products Page', () => {
     const expectedItemPrice = await InventoryPage.inventoryItemPrices[itemId].getText();
     const expectedItemImage = await InventoryPage.inventoryItemImages[itemId].getAttribute('src');
     // Compare the values to those on the details page
-    await (await InventoryPage.inventoryItemLink(expectedItemName)).click();
+    await InventoryPage.inventoryItemLink(expectedItemName).click();
     await ItemPage.waitForPageShown();
     await ItemPage.waitForElements();
     await expect(ItemPage.itemName).toHaveText(expectedItemName);
@@ -66,7 +67,7 @@ describe('Products Page', () => {
     let actualShoppingCartSize = await HeaderModal.shoppingCartBadge.getText();
     await expect(parseInt(actualShoppingCartSize)).toEqual(parseInt(initialShoppingCartSize) + 1);
     // The text for the item detail's "cart" button should be to "remove", rather than "add"
-    await (await InventoryPage.inventoryItemLink(itemName)).click();
+    await InventoryPage.inventoryItemLink(itemName).click();
     await expect(ItemPage.removeFromCartButton).toBeDisplayed();
     // Return back to inventory page and actully remove it
     await ItemPage.backButton.click();
@@ -78,21 +79,21 @@ describe('Products Page', () => {
       : '0';
     await expect(actualShoppingCartSize).toEqual(initialShoppingCartSize);
     // The text for the item detail's "cart" button should be to "add" once more, rather than "remove"
-    await (await InventoryPage.inventoryItemLink(itemName)).click();
+    await InventoryPage.inventoryItemLink(itemName).click();
     await expect(ItemPage.addToCartButton).toBeDisplayed();
   });
 
   it('The sort dropdown rearranges the product list as expected', async () => {
     // First check the default, item names (A-Z)
-    await compareSortedStringArrays(await InventoryPage.inventoryItemNames, (a, b) => (b > a ? -1 : 1));
+    await compareSortedStringArrays(InventoryPage.inventoryItemNames, (a, b) => (b > a ? -1 : 1));
     // Check item names (Z-A)
     await InventoryPage.sortDropdown.selectByAttribute('value', 'za');
-    await compareSortedStringArrays(await InventoryPage.inventoryItemNames, (a, b) => (a > b ? -1 : 1));
+    await compareSortedStringArrays(InventoryPage.inventoryItemNames, (a, b) => (a > b ? -1 : 1));
     // Check item prices (low -> high)
     await InventoryPage.sortDropdown.selectByAttribute('value', 'lohi');
-    await compareSortedNumberArrays(await InventoryPage.inventoryItemPrices, (a, b) => a - b);
+    await compareSortedNumberArrays(InventoryPage.inventoryItemPrices, (a, b) => a - b);
     // Check item prices (high -> low)
     await InventoryPage.sortDropdown.selectByAttribute('value', 'hilo');
-    await compareSortedNumberArrays(await InventoryPage.inventoryItemPrices, (a, b) => b - a);
+    await compareSortedNumberArrays(InventoryPage.inventoryItemPrices, (a, b) => b - a);
   });
 });

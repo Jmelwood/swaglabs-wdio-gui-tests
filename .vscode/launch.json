@@ -5,8 +5,7 @@
       "name": "WDIO Debug",
       "type": "node",
       "request": "launch",
-      "args": ["wdio.conf.ts", "--spec", "${file}"],
-      "runtimeArgs": ["--loader", "ts-node/esm"],
+      "args": ["run", "wdio.conf.ts", "--spec", "${file}"],
       "env": {
         "DEBUG": "true"
       },

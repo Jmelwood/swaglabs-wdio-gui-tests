@@ -2,7 +2,7 @@
 
 ## Summary
 
-Automated end-to-end GUI tests for SauceLabs' ["SwagLabs"](https://saucedemo.com) test website, mainly to play around with a simple [WebdriverIO v8](https://webdriver.io) automation framework setup. WDIO is both the test runner and asserter, paired with the [Mocha](https://mochajs.org) test framework. It hooks into [Chromedriver](https://chromedriver.chromium.org) to control the browser.
+Automated end-to-end GUI tests for SauceLabs' ["SwagLabs"](https://saucedemo.com) test website, mainly to play around with a simple [WebdriverIO v9](https://webdriver.io) automation framework setup. WDIO is both the test runner and asserter, paired with the [Mocha](https://mochajs.org) test framework. It hooks into [Chromedriver](https://chromedriver.chromium.org) to control the browser.
 
 All code is written in TypeScript, transpiled into ESM, and linted by ESLint and Prettier.
 
@@ -10,7 +10,7 @@ The goal of these tests are purely demonstrative of techniques for using WDIO, r
 
 ## Prerequisites
 
-- Google Chrome (last tested with version 126)
+- Google Chrome (last tested with version 135)
 - Node.js (last tested with version LTS 20.15.1)
 
 ## How to run tests
