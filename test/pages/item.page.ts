@@ -33,22 +33,6 @@ class ItemPage extends GeneralPage {
     return $('button[data-test="remove"]');
   }
 
-  /**
-   * Adds the specified item name to the shopping cart.
-   * @param itemId The item's id
-   */
-  async clickAddToCart() {
-    await this.addToCartButton.waitForAndClick();
-  }
-
-  /**
-   * Removes the specified item name from the shopping cart.
-   * @param itemId The item's id
-   */
-  async clickRemoveFromCart() {
-    await this.removeFromCartButton.waitForAndClick();
-  }
-
   async open(itemId: string) {
     await super.open(`inventory-item.html?id=${itemId}`);
     await this.waitForElements();

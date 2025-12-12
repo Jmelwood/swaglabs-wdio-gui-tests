@@ -19,10 +19,7 @@ export async function compareSortedStringArrays(
   array: IterableCollection<WebdriverIO.Element>,
   sortFunction: (val1: string, val2: string) => number
 ) {
-  const actualArray = await map(array, async (element: WebdriverIO.Element) => {
-    const text = await element.getText();
-    return text;
-  });
+  const actualArray = await map(array, async (element: WebdriverIO.Element) => await element.getText());
   const expectedArray = [...actualArray];
   // Using the sort function on this array should do nothing if already sorted properly
   expectedArray.sort(sortFunction);

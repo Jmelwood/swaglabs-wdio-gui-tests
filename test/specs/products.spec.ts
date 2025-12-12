@@ -69,7 +69,7 @@ describe('Products Page', () => {
     // The text for the item detail's "cart" button should be to "remove", rather than "add"
     await InventoryPage.inventoryItemLink(itemName).click();
     await expect(ItemPage.removeFromCartButton).toBeDisplayed();
-    // Return back to inventory page and actully remove it
+    // Return back to inventory page and actually remove it
     await ItemPage.backButton.click();
     await InventoryPage.waitForPageShown();
     await InventoryPage.waitForElements();

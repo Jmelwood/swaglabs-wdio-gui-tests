@@ -10,8 +10,8 @@ The goal of these tests are purely demonstrative of techniques for using WDIO, r
 
 ## Prerequisites
 
-- Google Chrome (last tested with version 135)
-- Node.js (last tested with version LTS 20.15.1)
+- Google Chrome (last tested with version 143)
+- Node.js (last tested with version LTS 24.11.1)
 
 ## How to run tests
 

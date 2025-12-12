@@ -64,12 +64,11 @@ class InventoryPage extends GeneralPage {
     );
     const itemPrices = await map(this.inventoryItemPrices, async (item: WebdriverIO.Element) => await item.getText());
     const choice = chance.integer({ min: 0, max: itemNames.length - 1 });
-    const randomItem = {
+    return {
       name: itemNames[choice],
       description: itemDescriptions[choice],
       price: itemPrices[choice]
     };
-    return randomItem;
   }
 
   /**

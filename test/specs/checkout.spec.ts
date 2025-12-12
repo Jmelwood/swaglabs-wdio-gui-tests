@@ -78,7 +78,7 @@ describe('Checkout', () => {
     await expect(CheckoutPage.completePonyImage).toBeDisplayed();
     await CheckoutPage.returnToInventoryButton.waitForAndClick();
     await InventoryPage.waitForPageShown();
-    // If the bage isn't displayed, then no items are registered as added
+    // If the page isn't displayed, then no items are registered as added
     await expect(HeaderModal.shoppingCartBadge).not.toBeDisplayed();
   });
 
@@ -90,7 +90,7 @@ describe('Checkout', () => {
     await CartPage.checkoutButton.waitForAndClick();
     await CheckoutPage.waitForPageShown();
     await CheckoutPage.continueButton.waitForAndClick();
-    // Verify the error container appesrs, and that a label from the next screen doesn't appear
+    // Verify the error container appears, and that a label from the next screen doesn't appear
     await expect(CheckoutPage.fieldErrorContainer).toBeDisplayed();
     await expect(CheckoutPage.subtotalLabel).not.toBeDisplayed();
   });

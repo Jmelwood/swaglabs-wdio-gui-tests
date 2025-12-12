@@ -158,7 +158,7 @@ export const config: WebdriverIO.Config = {
   // See the full list at http://mochajs.org/
   mochaOpts: {
     ui: 'bdd',
-    timeout: debug ? 9999999 : 60000,
+    timeout: debug ? 9999999 : 60_000,
     bail: false
   },
   //
@@ -171,7 +171,7 @@ export const config: WebdriverIO.Config = {
   // resolved to continue.
   /**
    * Gets executed once before all workers get launched.
-   * @param config wdio configuration object
+   * @param _config wdio configuration object
    * @param capabilities list of capabilities details
    */
   onPrepare: function (_config, capabilities) {
@@ -185,7 +185,7 @@ export const config: WebdriverIO.Config = {
     reportAggregator.clean();
   },
   /**
-   * Gets executed before a worker process is spawned and can be used to initialise specific service
+   * Gets executed before a worker process is spawned and can be used to initialize specific service
    * for that worker as well as modify runtime environments in an async fashion.
    * @param cid      capability id (e.g 0-0)
    * @param caps     object containing capabilities for session that will be spawn in the worker
@@ -196,7 +196,7 @@ export const config: WebdriverIO.Config = {
   // onWorkerStart: function (cid, caps, specs, args, execArgv) {
   // },
   /**
-   * Gets executed just before initialising the webdriver session and test framework. It allows you
+   * Gets executed just before initializing the webdriver session and test framework. It allows you
    * to manipulate configurations depending on the capability or spec.
    * @param config wdio configuration object
    * @param capabilities list of capabilities details
@@ -336,12 +336,12 @@ export const config: WebdriverIO.Config = {
   /**
    * Gets executed after all workers got shut down and the process is about to exit. An error
    * thrown in the onComplete hook will result in the test run failing.
-   * @param exitCode 0 - success, 1 - fail
-   * @param config wdio configuration object
-   * @param capabilities list of capabilities details
-   * @param results object containing test results
+   * @param _exitCode 0 - success, 1 - fail
+   * @param _config wdio configuration object
+   * @param _capabilities list of capabilities details
+   * @param _results object containing test results
    */
-  onComplete: async function (_exitCode, _config, _capabilities, _results) {
+  onComplete: async function () {
     await reportAggregator.createReport();
   }
   /**
